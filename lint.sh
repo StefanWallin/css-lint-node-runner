@@ -6,12 +6,12 @@
 
 #Set up some initial vars:
 STRICTMODE=false
+DRYRUN=false
 LOGFILE=./logs/csswarnings.log	
 TMPFILE=.tmp.txt
-
+: ${NODEPATH:="node"}
 # Init the temp file
 touch ${TMPFILE}
-
 
 #Loop through the arguments in STDIN
 while read -t 1 line; do
@@ -27,6 +27,10 @@ done
 for (( i=1 ; i <= $#; i++ ))
 do 
 	case ${!i} in
+		"--dry-run")
+			DRYRUN=true;
+			continue;
+			;;
 		"--strict")
 			STRICTMODE=true
 			continue;
@@ -48,7 +52,7 @@ do
 done
 
 argc=`cat .tmp.txt|wc -l`
-echo $argc
+
 if [  $(($argc+0)) == 0 ]; then
 	echo "Usage: "
 	echo "	lint.sh [-l logfile] [--strict] folder [folder...]"
@@ -67,7 +71,8 @@ MYFILES=`cat ${TMPFILE} |tr '\n' ' '`
 rm ${LOGFILE}; touch ${LOGFILE}
 
 # Execute the linter and save the output in our log-file.
-java -jar rhino.jar csslint.js $MYFILES &> ${LOGFILE}
+${NODEPATH} lib/csslint/build/npm/cli.js $MYFILES &> ${LOGFILE}
+
 
 if [ $STRICTMODE == "true" ]; then
 	# Find out how many errors and warnings we had
@@ -102,5 +107,9 @@ rm ${TMPFILE}
 
 #exit with the number of errors.
 # exit status greater than zero should halt the following executions.
-exit $R;
+if(!DRYRUN)
+	exit $R;
+else
+	exit 0;
+
 
