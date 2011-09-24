@@ -55,8 +55,8 @@ argc=`cat .tmp.txt|wc -l`
 
 if [  $(($argc+0)) == 0 ]; then
 	echo "Usage: "
-	echo "	lint.sh [-l logfile] [--strict] folder [folder...]"
-	echo "	pwd|lint.sh"
+	echo "	lint.sh [-l logfile] [--strict] [--dry-run] folder [folder...]"
+	echo "	pwd|sh lint.sh"
 	exit 1;
 fi
 
